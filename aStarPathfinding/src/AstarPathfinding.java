@@ -38,6 +38,8 @@ public class AstarPathfinding {
     int[] startIndex = {-3, -3};
     int[] endIndex = {-3, -3};
 
+    boolean debugPressed = false;
+
     boolean startPlaced = false;
     boolean endPlaced = false;
 
@@ -109,9 +111,9 @@ public class AstarPathfinding {
         // Make the window visible
         glfwShowWindow(window);
 
-        int cellWidth = 25;
-        int cellHeight = 25;
-        int cellSpacing = 0;
+        int cellWidth = 200;
+        int cellHeight = 200;
+        int cellSpacing = 5;
         int cellXSize = (cellWidth + cellSpacing);
         int cellYsize = (cellHeight + cellSpacing);
         int rows = (WIDTH / cellXSize) - 1;
@@ -178,13 +180,20 @@ public class AstarPathfinding {
             for(ArrayList<Cell> column : cellColumns) {
                 for(Cell cell : column) {
                     cell.inBounds(newMouseX, newMouseY);
+
+                    if(cell.isSelected && MouseButtons.button == 3 && MouseButtons.action == 1 && debugPressed == false) {
+                        System.out.println(cell.type + " at " + cell.index[0] + ", " + cell.index[1]);
+                        debugPressed = true;
+                    } else if (MouseButtons.button == 3 && MouseButtons.action == 0) {
+                        debugPressed = false;
+                    }
+
                     if (MouseButtons.button == 1 && MouseButtons.action == 1 && cell.isSelected) {
                         if (cell.type == "start") {
                             startPlaced = false;
                             startIndex[0] = -3;
                             startIndex[1] = -3;
-                        }
-                        if (cell.type == "end") {
+                        } else if (cell.type == "end") {
                             endPlaced = false;
                             endIndex[0] = -3;
                             endIndex[1] = -3;
@@ -194,34 +203,15 @@ public class AstarPathfinding {
                         if(cellTypes[typeSelected] == "start" && !startPlaced) {
                             cell.type = cellTypes[typeSelected];
                             startPlaced = true;
-                            startIndex = cell.index;
+                            startIndex[0] = cell.index[0];
+                            startIndex[1] = cell.index[1];
                         } else if (cellTypes[typeSelected] == "end" && !endPlaced) {
                             cell.type = cellTypes[typeSelected];
                             endPlaced = true;
-                            endIndex = cell.index;
+                            endIndex[0] = cell.index[0];
+                            endIndex[0] = cell.index[1];
                         } else if (cellTypes[typeSelected] != "start" && cellTypes[typeSelected] != "end") {
                             cell.type = cellTypes[typeSelected];
-                        }
-                    }
-
-
-                    if (cell.type == "space" && startPlaced && endPlaced) {
-                        if (cell.index[0] == startIndex[0] + 1 && cell.index[1] == startIndex[1]) {
-                            cell.type = "path";
-                        } else if (cell.index[1] == startIndex[1] + 1 && cell.index[0] == startIndex[0]) {
-                            cell.type = "path";
-                        } else if (cell.index[1] == startIndex[1] + 1 && cell.index[0] == startIndex[0] + 1) {
-                            cell.type = "path";
-                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1]) {
-                            cell.type = "path";
-                        } else if (cell.index[1] == startIndex[1] - 1 && cell.index[0] == startIndex[0]) {
-                            cell.type = "path";
-                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1] - 1) {
-                            cell.type = "path";
-                        } else if (cell.index[0] == startIndex[0] + 1 && cell.index[1] == startIndex[1] - 1) {
-                            cell.type = "path";
-                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1] + 1) {
-                            cell.type = "path";
                         }
                     }
 
@@ -231,11 +221,40 @@ public class AstarPathfinding {
                         }
                     }
 
+                    //System.out.println(startIndex[0] + " " + startIndex[1]);
+                    if (cell.type == "space" && startPlaced && endPlaced) {
+                        if (cell.index[0] == startIndex[0] + 1 && cell.index[1] == startIndex[1]) {
+                            cell.type = "path";
+                            System.out.println("Middle Right, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[1] == startIndex[1] + 1 && cell.index[0] == startIndex[0]) {
+                            cell.type = "path";
+                            System.out.println("Middle Top, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[1] == startIndex[1] + 1 && cell.index[0] == startIndex[0] + 1) {
+                            cell.type = "path";
+                            System.out.println("Top Right, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1]) {
+                            cell.type = "path";
+                            System.out.println("Middle Left, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[1] == startIndex[1] - 1 && cell.index[0] == startIndex[0]) {
+                            cell.type = "path";
+                            System.out.println("Middle Down, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1] - 1) {
+                            cell.type = "path";
+                            System.out.println("Bottom Left, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == startIndex[0] + 1 && cell.index[1] == startIndex[1] - 1) {
+                            cell.type = "path";
+                            System.out.println("Bottom Right, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1] + 1) {
+                            cell.type = "path";
+                            System.out.println("Top Left, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        }
+                    }
+
                     cell.renderSquare();
                 }
             }
 
-            System.out.println("Start: " + startIndex[0] + " " + startIndex[1] + " End: " + endIndex[0] + " " + endIndex[1]);
+            //System.out.println("Start: " + startIndex[0] + " " + startIndex[1] + " End: " + endIndex[0] + " " + endIndex[1]);
 
             glfwPollEvents();
             glfwSwapBuffers(window); // swap the color buffers
