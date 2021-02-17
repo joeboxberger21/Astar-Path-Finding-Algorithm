@@ -37,6 +37,8 @@ public class AstarPathfinding {
     int typeSelected = 0;
     int[] startIndex = {-3, -3};
     int[] endIndex = {-3, -3};
+    int[] searchIndex = {-3, -3};
+    int lowestCost = 99999999;
 
     boolean debugPressed = false;
 
@@ -111,9 +113,9 @@ public class AstarPathfinding {
         // Make the window visible
         glfwShowWindow(window);
 
-        int cellWidth = 200;
-        int cellHeight = 200;
-        int cellSpacing = 5;
+        int cellWidth = 50;
+        int cellHeight = 50;
+        int cellSpacing = 0;
         int cellXSize = (cellWidth + cellSpacing);
         int cellYsize = (cellHeight + cellSpacing);
         int rows = (WIDTH / cellXSize) - 1;
@@ -174,8 +176,6 @@ public class AstarPathfinding {
                 keyPressed = false;
             }
 
-            //System.out.println(startIndex[0] + " " + startIndex[1]);
-
 
             for(ArrayList<Cell> column : cellColumns) {
                 for(Cell cell : column) {
@@ -205,6 +205,8 @@ public class AstarPathfinding {
                             startPlaced = true;
                             startIndex[0] = cell.index[0];
                             startIndex[1] = cell.index[1];
+                            searchIndex[0] = startIndex[0];
+                            searchIndex[1] = startIndex[1];
                         } else if (cellTypes[typeSelected] == "end" && !endPlaced) {
                             cell.type = cellTypes[typeSelected];
                             endPlaced = true;
@@ -215,46 +217,53 @@ public class AstarPathfinding {
                         }
                     }
 
-                    if (cell.type == "path") {
+                    if (cell.type == "search" || cell.type == "path") {
                         if(!startPlaced || !endPlaced) {
                             cell.type = "space";
                         }
                     }
 
-                    //System.out.println(startIndex[0] + " " + startIndex[1]);
                     if (cell.type == "space" && startPlaced && endPlaced) {
-                        if (cell.index[0] == startIndex[0] + 1 && cell.index[1] == startIndex[1]) {
-                            cell.type = "path";
-                            System.out.println("Middle Right, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
-                        } else if (cell.index[1] == startIndex[1] + 1 && cell.index[0] == startIndex[0]) {
-                            cell.type = "path";
-                            System.out.println("Middle Top, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
-                        } else if (cell.index[1] == startIndex[1] + 1 && cell.index[0] == startIndex[0] + 1) {
-                            cell.type = "path";
-                            System.out.println("Top Right, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
-                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1]) {
-                            cell.type = "path";
-                            System.out.println("Middle Left, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
-                        } else if (cell.index[1] == startIndex[1] - 1 && cell.index[0] == startIndex[0]) {
-                            cell.type = "path";
-                            System.out.println("Middle Down, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
-                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1] - 1) {
-                            cell.type = "path";
-                            System.out.println("Bottom Left, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
-                        } else if (cell.index[0] == startIndex[0] + 1 && cell.index[1] == startIndex[1] - 1) {
-                            cell.type = "path";
-                            System.out.println("Bottom Right, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
-                        } else if (cell.index[0] == startIndex[0] - 1 && cell.index[1] == startIndex[1] + 1) {
-                            cell.type = "path";
-                            System.out.println("Top Left, Start: " + startIndex[0] + " " + startIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        if (cell.index[0] == searchIndex[0] + 1 && cell.index[1] == searchIndex[1]) {
+                            cell.type = "search";
+                            System.out.println("Middle Right, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[1] == searchIndex[1] + 1 && cell.index[0] == searchIndex[0]) {
+                            cell.type = "search";
+                            System.out.println("Middle Top, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[1] == searchIndex[1] + 1 && cell.index[0] == searchIndex[0] + 1) {
+                            cell.type = "search";
+                            System.out.println("Top Right, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == searchIndex[0] - 1 && cell.index[1] == searchIndex[1]) {
+                            cell.type = "search";
+                            System.out.println("Middle Left, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[1] == searchIndex[1] - 1 && cell.index[0] == searchIndex[0]) {
+                            cell.type = "search";
+                            System.out.println("Middle Down, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == searchIndex[0] - 1 && cell.index[1] == searchIndex[1] - 1) {
+                            cell.type = "search";
+                            System.out.println("Bottom Left, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == searchIndex[0] + 1 && cell.index[1] == searchIndex[1] - 1) {
+                            cell.type = "search";
+                            System.out.println("Bottom Right, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
+                        } else if (cell.index[0] == searchIndex[0] - 1 && cell.index[1] == searchIndex[1] + 1) {
+                            cell.type = "search";
+                            System.out.println("Top Left, Start: " + searchIndex[0] + " " + searchIndex[1] + " Cell: " + cell.index[0] + " " + cell.index[1]);
                         }
+                    }
+
+                    if (cell.type.equals("search")) {
+                        int cost = Fcost(startIndex[0], startIndex[1], endIndex[0], endIndex[1], cell.index[0], cell.index[1]);
+                        if (cost <= lowestCost) {
+                            lowestCost = cost;
+                        } else {
+                            cell.type = "space";
+                        }
+                        System.out.println(cost + " " + lowestCost);
                     }
 
                     cell.renderSquare();
                 }
             }
-
-            //System.out.println("Start: " + startIndex[0] + " " + startIndex[1] + " End: " + endIndex[0] + " " + endIndex[1]);
 
             glfwPollEvents();
             glfwSwapBuffers(window); // swap the color buffers
@@ -267,11 +276,11 @@ public class AstarPathfinding {
         new AstarPathfinding().run();
     }
 
-    public static int distaceCost(int targetX, int targetY, int cellX, int cellY) {
-        return (int) Math.sqrt((cellX - targetX)^2 + (cellY - targetY)^2);
+    public static int distance(int targetX, int targetY, int cellX, int cellY) {
+        return (int) Math.sqrt(Math.pow((cellX - targetX), 2) + Math.pow((cellY - targetY), 2))*10;
     }
     public static int Fcost(int startX, int startY, int endX, int endY, int cellX, int cellY) {
-        return distaceCost(startX, startY, cellX, cellY) + distaceCost(endX, endY, cellX, cellY);
+        return distance(startX, startY, cellX, cellY) + distance(endX, endY, cellX, cellY);
     }
 }
 
@@ -313,6 +322,10 @@ class Cell {
             red = 0.3f;
             green = 0.3f;
             blue = 0.6f;
+        } else if (type.equals("search")) {
+            red = 0.4f;
+            green = 0.2f;
+            blue = 0.4f;
         }
 
         if (isSelected) {
