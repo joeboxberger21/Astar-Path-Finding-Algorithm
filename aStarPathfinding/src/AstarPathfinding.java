@@ -33,7 +33,7 @@ public class AstarPathfinding {
     private GLFWKeyCallback keyCallback;
 
     private ArrayList<ArrayList> cellColumns = new ArrayList<ArrayList>();
-    String[] cellTypes = {"solid", "start", "end"};
+    String[] cellTypes = {"solid", "start", "end", "search"};
     int typeSelected = 0;
     int[] startIndex = {-3, -3};
     int[] endIndex = {-3, -3};
@@ -113,9 +113,9 @@ public class AstarPathfinding {
         // Make the window visible
         glfwShowWindow(window);
 
-        int cellWidth = 50;
-        int cellHeight = 50;
-        int cellSpacing = 0;
+        int cellWidth = 150;
+        int cellHeight = 150;
+        int cellSpacing = 5;
         int cellXSize = (cellWidth + cellSpacing);
         int cellYsize = (cellHeight + cellSpacing);
         int rows = (WIDTH / cellXSize) - 1;
@@ -183,6 +183,8 @@ public class AstarPathfinding {
 
                     if(cell.isSelected && MouseButtons.button == 3 && MouseButtons.action == 1 && debugPressed == false) {
                         System.out.println(cell.type + " at " + cell.index[0] + ", " + cell.index[1]);
+                        System.out.println("distance from start: " + distance(startIndex[0], startIndex[1], cell.index[0], cell.index[1]) + " | distance from end: " + distance(endIndex[0], endIndex[1], cell.index[0], cell.index[1]));
+                        System.out.println("Fcost: " + Fcost(startIndex[0], startIndex[1], endIndex[0], endIndex[1], cell.index[0], cell.index[1]) + "\n");
                         debugPressed = true;
                     } else if (MouseButtons.button == 3 && MouseButtons.action == 0) {
                         debugPressed = false;
@@ -193,10 +195,12 @@ public class AstarPathfinding {
                             startPlaced = false;
                             startIndex[0] = -3;
                             startIndex[1] = -3;
+                            lowestCost = 99999;
                         } else if (cell.type == "end") {
                             endPlaced = false;
                             endIndex[0] = -3;
                             endIndex[1] = -3;
+                            lowestCost = 99999;
                         }
                         cell.type = "space";
                     } else if (MouseButtons.button == 0 && MouseButtons.action == 1 && cell.isSelected) {
@@ -211,7 +215,7 @@ public class AstarPathfinding {
                             cell.type = cellTypes[typeSelected];
                             endPlaced = true;
                             endIndex[0] = cell.index[0];
-                            endIndex[0] = cell.index[1];
+                            endIndex[1] = cell.index[1];
                         } else if (cellTypes[typeSelected] != "start" && cellTypes[typeSelected] != "end") {
                             cell.type = cellTypes[typeSelected];
                         }
@@ -253,12 +257,13 @@ public class AstarPathfinding {
 
                     if (cell.type.equals("search")) {
                         int cost = Fcost(startIndex[0], startIndex[1], endIndex[0], endIndex[1], cell.index[0], cell.index[1]);
-                        if (cost <= lowestCost) {
+                        if (cost < lowestCost) {
                             lowestCost = cost;
-                        } else {
-                            cell.type = "space";
+                            System.out.println("New Cost");
                         }
-                        System.out.println(cost + " " + lowestCost);
+//                        else {
+//                            cell.type = "space";
+//                        }
                     }
 
                     cell.renderSquare();
@@ -277,7 +282,7 @@ public class AstarPathfinding {
     }
 
     public static int distance(int targetX, int targetY, int cellX, int cellY) {
-        return (int) Math.sqrt(Math.pow((cellX - targetX), 2) + Math.pow((cellY - targetY), 2))*10;
+        return (int) (Math.sqrt(Math.pow((cellX - targetX), 2) + Math.pow((cellY - targetY), 2))*10);
     }
     public static int Fcost(int startX, int startY, int endX, int endY, int cellX, int cellY) {
         return distance(startX, startY, cellX, cellY) + distance(endX, endY, cellX, cellY);
@@ -323,9 +328,9 @@ class Cell {
             green = 0.3f;
             blue = 0.6f;
         } else if (type.equals("search")) {
-            red = 0.4f;
-            green = 0.2f;
-            blue = 0.4f;
+            red = 0.6f;
+            green = 0.4f;
+            blue = 0.8f;
         }
 
         if (isSelected) {
